@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #080d1a;
+    color: #f1f5f9;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Sound Wave Animation for speaking indicator */
+@keyframes soundwave {
+  0%, 100% {
+    height: 6px;
+  }
+  50% {
+    height: 28px;
+  }
+}
+
+.animate-wave-1 {
+  animation: soundwave 0.8s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+
+.animate-wave-2 {
+  animation: soundwave 0.8s ease-in-out infinite;
+  animation-delay: 0.25s;
+}
+
+.animate-wave-3 {
+  animation: soundwave 0.8s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.animate-wave-4 {
+  animation: soundwave 0.8s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+
+.animate-wave-5 {
+  animation: soundwave 0.8s ease-in-out infinite;
+  animation-delay: 0.35s;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
