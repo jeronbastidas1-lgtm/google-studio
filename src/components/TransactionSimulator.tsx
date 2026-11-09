@@ -17,11 +17,11 @@ interface TransactionSimulatorProps {
 }
 
 const PRESETS = [
-  { bank: 'Nequi', amount: 50000, currency: 'COP' as CurrencyCode, sender: 'Andrés Camargo', concept: 'Venta de productos' },
-  { bank: 'Bancolombia', amount: 150000, currency: 'COP' as CurrencyCode, sender: 'Lucía Fernández', concept: 'Transferencia por servicios' },
-  { bank: 'DaviPlata', amount: 35000, currency: 'COP' as CurrencyCode, sender: 'Jorge Valencia', concept: 'Pago cuenta almuerzo' },
-  { bank: 'Mercado Pago', amount: 48.50, currency: 'USD' as CurrencyCode, sender: 'Tienda Online S.A.', concept: 'Cobro de pedido #402' },
-  { bank: 'BBVA', amount: 95000, currency: 'COP' as CurrencyCode, sender: 'Carolina Ospina', concept: 'Depósito a cuenta' }
+  { bank: 'Nequi Personal', amount: 30000, currency: 'COP' as CurrencyCode, sender: 'Andrés Camargo', concept: 'Transferencia personal' },
+  { bank: 'Nequi Negocios', amount: 37200, currency: 'COP' as CurrencyCode, sender: 'Lucía Fernández', concept: 'Venta de productos' },
+  { bank: 'DaviPlata', amount: 1000, currency: 'COP' as CurrencyCode, sender: 'Jorge Valencia', concept: 'Pago cuenta express' },
+  { bank: 'Nequi Personal', amount: 15000, currency: 'COP' as CurrencyCode, sender: 'Carolina Ospina', concept: 'Abono a cuenta' },
+  { bank: 'Nequi Negocios', amount: 50000, currency: 'COP' as CurrencyCode, sender: 'Carlos Restrepo', concept: 'Cobro de pedido #201' }
 ];
 
 export const TransactionSimulator: React.FC<TransactionSimulatorProps> = ({
@@ -32,15 +32,15 @@ export const TransactionSimulator: React.FC<TransactionSimulatorProps> = ({
   const [activeTab, setActiveTab] = useState<'quick' | 'custom' | 'sms'>('quick');
 
   // Custom Form state
-  const [customBank, setCustomBank] = useState('Nequi');
-  const [customAmount, setCustomAmount] = useState('75000');
+  const [customBank, setCustomBank] = useState('Nequi Personal');
+  const [customAmount, setCustomAmount] = useState('30000');
   const [customCurrency, setCustomCurrency] = useState<CurrencyCode>('COP');
   const [customSender, setCustomSender] = useState('Juan David Mendoza');
   const [customConcept, setCustomConcept] = useState('Pago de pedido');
 
   // SMS Parser state
   const [rawSms, setRawSms] = useState(
-    '¡Te acaban de enviar $50.000! Maria Gomez te envio plata desde Nequi. Saldo disponible: $340.000'
+    '¡Te acaban de enviar $30.000! Maria Gomez te envio plata desde Nequi.'
   );
 
   const handleCustomSubmit = (e: React.FormEvent) => {
@@ -188,16 +188,9 @@ export const TransactionSimulator: React.FC<TransactionSimulatorProps> = ({
               onChange={(e) => setCustomBank(e.target.value)}
               className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-sky-500"
             >
-              <option value="Nequi">Nequi</option>
-              <option value="Bancolombia">Bancolombia</option>
-              <option value="DaviPlata">DaviPlata</option>
-              <option value="BBVA">BBVA</option>
-              <option value="Mercado Pago">Mercado Pago</option>
-              <option value="Santander">Santander</option>
-              <option value="Nu">Nu (Nubank)</option>
-              <option value="Zelle">Zelle</option>
-              <option value="SPEI México">SPEI México</option>
-              <option value="Bizum">Bizum</option>
+              <option value="Nequi Personal">Nequi Personal (# 3005668721)</option>
+              <option value="Nequi Negocios">Nequi Negocios (# 3014197116)</option>
+              <option value="DaviPlata">DaviPlata (# 3016151802)</option>
             </select>
           </div>
 

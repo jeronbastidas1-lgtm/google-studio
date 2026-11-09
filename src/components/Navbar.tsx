@@ -12,7 +12,8 @@ interface NavbarProps {
   isSpeaking: boolean;
   sseConnected: boolean;
   canInstallPwa: boolean;
-  onInstallPwa: () => void;
+  isInstalled: boolean;
+  onOpenInstallModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -25,7 +26,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   isSpeaking,
   sseConnected,
   canInstallPwa,
-  onInstallPwa
+  isInstalled,
+  onOpenInstallModal
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-[#0a101f]/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3.5">
@@ -102,25 +104,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
-          {/* Android PWA Install or Guide */}
-          {canInstallPwa ? (
+          {/* Android PWA Install or Installed Status */}
+          {isInstalled ? (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>App Instalada</span>
+            </div>
+          ) : (
             <button
-              onClick={onInstallPwa}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer"
+              onClick={onOpenInstallModal}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-md shadow-emerald-500/25 active:scale-95 cursor-pointer transition"
+              title="Instalar VozBanco en Android"
             >
               <Smartphone className="w-4 h-4" />
               <span>Instalar en Android</span>
             </button>
-          ) : (
-            <button
-              onClick={onOpenAndroidGuide}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95 cursor-pointer"
-              title="Guía para Android"
-            >
-              <Smartphone className="w-4 h-4 text-sky-400" />
-              <span className="hidden sm:inline">Guía Android</span>
-            </button>
           )}
+
+          {/* Android Guide Button */}
+          <button
+            onClick={onOpenAndroidGuide}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95 cursor-pointer"
+            title="Guía de configuración en Android"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-sky-400" />
+            <span className="hidden md:inline">Guía Android</span>
+          </button>
 
           {/* Webhook Button */}
           <button

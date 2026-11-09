@@ -21,10 +21,18 @@ export function parseBankNotificationText(rawText: string): ParsedBankMessage {
   const lower = text.toLowerCase();
 
   // 1. Detect Bank
-  let detectedBank = 'Banco';
-  if (lower.includes('nequi')) detectedBank = 'Nequi';
-  else if (lower.includes('bancolombia')) detectedBank = 'Bancolombia';
-  else if (lower.includes('daviplata')) detectedBank = 'DaviPlata';
+  let detectedBank = 'Nequi Personal';
+  if (lower.includes('nequi')) {
+    if (lower.includes('negocio') || lower.includes('3014197116')) {
+      detectedBank = 'Nequi Negocios';
+    } else {
+      detectedBank = 'Nequi Personal';
+    }
+  } else if (lower.includes('daviplata')) {
+    detectedBank = 'DaviPlata';
+  } else if (lower.includes('bancolombia')) {
+    detectedBank = 'Bancolombia';
+  }
   else if (lower.includes('bbva')) detectedBank = 'BBVA';
   else if (lower.includes('mercado pago') || lower.includes('mercadopago')) detectedBank = 'Mercado Pago';
   else if (lower.includes('santander')) detectedBank = 'Santander';

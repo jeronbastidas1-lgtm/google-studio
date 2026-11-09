@@ -65,7 +65,7 @@ export const VoiceStatusHero: React.FC<VoiceStatusHeroProps> = ({
               )}
             </h2>
             <p className="text-sm sm:text-base text-slate-300 mt-2 leading-relaxed">
-              No tienes que revisar la pantalla mientras trabajas o atiendes a tus clientes. Cuando entra una transacción de Nequi, Bancolombia, BBVA o DaviPlata, VozBanco pronuncia el monto exacto y el remitente al instante.
+              No tienes que revisar la pantalla mientras trabajas o atiendes a tus clientes. Cuando entra una transacción de Nequi Personal, Nequi Negocios o DaviPlata, VozBanco pronuncia el monto exacto y el remitente al instante.
             </p>
           </div>
 

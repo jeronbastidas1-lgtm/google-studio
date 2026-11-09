@@ -1,6 +1,8 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
@@ -34,119 +36,91 @@ interface StoredTransaction {
 
 const bankAccounts = [
   {
-    id: 'bank_nequi',
+    id: 'bank_nequi_personal',
     name: 'Nequi Personal',
-    bank: 'Nequi',
+    bank: 'Nequi Personal',
     accountType: 'digital_wallet',
-    accountNumber: '••• 314 9021',
-    balance: 840000,
+    accountNumber: '3005668721',
+    balance: 30000,
     currency: 'COP',
     color: '#8b5cf6',
     connected: true,
     lastSync: new Date().toISOString(),
+    syncMethod: 'sms_listener',
+    icon: 'Smartphone'
+  },
+  {
+    id: 'bank_nequi_negocios',
+    name: 'Nequi Negocios',
+    bank: 'Nequi Negocios',
+    accountType: 'digital_wallet',
+    accountNumber: '3014197116',
+    balance: 37200,
+    currency: 'COP',
+    color: '#a855f7',
+    connected: true,
+    lastSync: new Date().toISOString(),
     syncMethod: 'webhook',
     icon: 'Smartphone'
   },
   {
-    id: 'bank_bancolombia',
-    name: 'Bancolombia Ahorros',
-    bank: 'Bancolombia',
-    accountType: 'savings',
-    accountNumber: '••• 4521',
-    balance: 2450000,
-    currency: 'COP',
-    color: '#eab308',
-    connected: true,
-    lastSync: new Date().toISOString(),
-    syncMethod: 'sms_listener',
-    icon: 'Building2'
-  },
-  {
     id: 'bank_daviplata',
-    name: 'DaviPlata Negocio',
+    name: 'DaviPlata',
     bank: 'DaviPlata',
     accountType: 'digital_wallet',
-    accountNumber: '••• 8102',
-    balance: 420000,
+    accountNumber: '3016151802',
+    balance: 1000,
     currency: 'COP',
     color: '#ef4444',
     connected: true,
     lastSync: new Date().toISOString(),
-    syncMethod: 'webhook',
+    syncMethod: 'sms_listener',
     icon: 'Smartphone'
-  },
-  {
-    id: 'bank_bbva',
-    name: 'BBVA Nómina',
-    bank: 'BBVA',
-    accountType: 'checking',
-    accountNumber: '••• 9934',
-    balance: 1150000,
-    currency: 'COP',
-    color: '#0284c7',
-    connected: false,
-    lastSync: new Date().toISOString(),
-    syncMethod: 'open_banking',
-    icon: 'CreditCard'
-  },
-  {
-    id: 'bank_mercadopago',
-    name: 'Mercado Pago Cobros',
-    bank: 'Mercado Pago',
-    accountType: 'digital_wallet',
-    accountNumber: '••• 5519',
-    balance: 310.50,
-    currency: 'USD',
-    color: '#0ea5e9',
-    connected: true,
-    lastSync: new Date().toISOString(),
-    syncMethod: 'webhook',
-    icon: 'ShoppingBag'
   }
 ];
 
 const transactions: StoredTransaction[] = [
   {
     id: 'tx_seed_1',
-    amount: 55000,
+    amount: 15000,
     currency: 'COP',
     type: 'income',
-    bank: 'Nequi',
+    bank: 'Nequi Personal',
     sender: 'Camila Rodriguez',
-    accountNumber: '••• 314 9021',
+    accountNumber: '3005668721',
     timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
     status: 'completed',
     concept: 'Pago pedido #1042',
     spoken: true,
-    spokenText: '¡Pago recibido! Cincuenta y cinco mil pesos de Camila Rodriguez en Nequi.'
+    spokenText: '¡Pago recibido! Quince mil pesos de Camila Rodriguez en Nequi Personal.'
   },
   {
     id: 'tx_seed_2',
-    amount: 180000,
+    amount: 25000,
     currency: 'COP',
     type: 'income',
-    bank: 'Bancolombia',
+    bank: 'Nequi Negocios',
     sender: 'Distribuidora Central S.A.S',
-    accountNumber: '••• 4521',
+    accountNumber: '3014197116',
     timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
     status: 'completed',
-    concept: 'Transferencia bancaria recibida',
+    concept: 'Venta de productos en negocio',
     spoken: true,
-    spokenText: '¡Pago recibido! Ciento ochenta mil pesos de Distribuidora Central en Bancolombia.'
+    spokenText: '¡Pago recibido! Veinticinco mil pesos de Distribuidora Central en Nequi Negocios.'
   },
   {
     id: 'tx_seed_3',
-    amount: 32000,
+    amount: 1000,
     currency: 'COP',
     type: 'income',
     bank: 'DaviPlata',
     sender: 'Felipe Morales',
-    accountNumber: '••• 8102',
+    accountNumber: '3016151802',
     timestamp: new Date(Date.now() - 1000 * 60 * 95).toISOString(),
     status: 'completed',
     concept: 'Transferencia express',
     spoken: true,
-    spokenText: '¡Pago recibido! Treinta y dos mil pesos de Felipe Morales en DaviPlata.'
+    spokenText: '¡Pago recibido! Mil pesos de Felipe Morales en DaviPlata.'
   }
 ];
 
@@ -359,6 +333,28 @@ Responde ÚNICAMENTE con la frase, sin comillas adicionales.`;
     });
   }
 });
+
+// Explicit PWA routes for Android WebAPK compatibility
+app.get('/manifest.json', (_req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  const targetFile = fs.existsSync(path.resolve(__dirname, 'dist/manifest.json'))
+    ? path.resolve(__dirname, 'dist/manifest.json')
+    : path.resolve(__dirname, 'public/manifest.json');
+  res.sendFile(targetFile);
+});
+
+app.get('/sw.js', (_req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  res.setHeader('Service-Worker-Allowed', '/');
+  const targetFile = fs.existsSync(path.resolve(__dirname, 'dist/sw.js'))
+    ? path.resolve(__dirname, 'dist/sw.js')
+    : path.resolve(__dirname, 'public/sw.js');
+  res.sendFile(targetFile);
+});
+
+// Serve public directory static assets directly
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 // Boot server & Vite
 async function startServer() {

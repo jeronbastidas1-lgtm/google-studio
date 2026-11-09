@@ -6,11 +6,20 @@ test('parseBankNotificationText detects Nequi SMS format', () => {
   const sms = '¡Te acaban de enviar $50.000! Maria Gomez te envio plata desde Nequi.';
   const parsed = parseBankNotificationText(sms);
 
-  assert.equal(parsed.bank, 'Nequi');
+  assert.ok(parsed.bank.includes('Nequi'));
   assert.equal(parsed.amount, 50000);
   assert.equal(parsed.currency, 'COP');
   assert.equal(parsed.type, 'income');
   assert.ok(parsed.sender.includes('Maria Gomez'));
+});
+
+test('parseBankNotificationText detects Nequi Negocios', () => {
+  const sms = 'Nequi Negocios: Te enviaron $37.200 a tu cuenta 3014197116 de Carlos Perez.';
+  const parsed = parseBankNotificationText(sms);
+
+  assert.equal(parsed.bank, 'Nequi Negocios');
+  assert.equal(parsed.amount, 37200);
+  assert.equal(parsed.currency, 'COP');
 });
 
 test('parseBankNotificationText detects Bancolombia transfer notification', () => {

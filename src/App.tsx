@@ -15,6 +15,9 @@ import { VoiceSettingsModal } from './components/VoiceSettingsModal';
 import { AndroidSetupModal } from './components/AndroidSetupModal';
 import { WebhookModal } from './components/WebhookModal';
 import { ConnectBankModal } from './components/ConnectBankModal';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
+import { InstallModal } from './components/InstallModal';
+import { usePWAInstall } from './hooks/usePWAInstall';
 import { voiceManager } from './utils/speechSynthesis';
 import { buildSpokenAnnouncement } from './utils/speechFormatter';
 import { unlockAudio } from './utils/soundEffects';
@@ -37,74 +40,46 @@ const DEFAULT_SETTINGS: VoiceSettings = {
 
 const DEFAULT_BANKS: BankAccount[] = [
   {
-    id: 'bank_nequi',
+    id: 'bank_nequi_personal',
     name: 'Nequi Personal',
-    bank: 'Nequi',
+    bank: 'Nequi Personal',
     accountType: 'digital_wallet',
-    accountNumber: '••• 314 9021',
-    balance: 840000,
+    accountNumber: '3005668721',
+    balance: 30000,
     currency: 'COP',
     color: '#8b5cf6',
     connected: true,
     lastSync: new Date().toISOString(),
+    syncMethod: 'sms_listener',
+    icon: 'Smartphone'
+  },
+  {
+    id: 'bank_nequi_negocios',
+    name: 'Nequi Negocios',
+    bank: 'Nequi Negocios',
+    accountType: 'digital_wallet',
+    accountNumber: '3014197116',
+    balance: 37200,
+    currency: 'COP',
+    color: '#a855f7',
+    connected: true,
+    lastSync: new Date().toISOString(),
     syncMethod: 'webhook',
     icon: 'Smartphone'
   },
   {
-    id: 'bank_bancolombia',
-    name: 'Bancolombia Ahorros',
-    bank: 'Bancolombia',
-    accountType: 'savings',
-    accountNumber: '••• 4521',
-    balance: 2450000,
-    currency: 'COP',
-    color: '#eab308',
-    connected: true,
-    lastSync: new Date().toISOString(),
-    syncMethod: 'sms_listener',
-    icon: 'Building2'
-  },
-  {
     id: 'bank_daviplata',
-    name: 'DaviPlata Negocio',
+    name: 'DaviPlata',
     bank: 'DaviPlata',
     accountType: 'digital_wallet',
-    accountNumber: '••• 8102',
-    balance: 420000,
+    accountNumber: '3016151802',
+    balance: 1000,
     currency: 'COP',
     color: '#ef4444',
     connected: true,
     lastSync: new Date().toISOString(),
-    syncMethod: 'webhook',
+    syncMethod: 'sms_listener',
     icon: 'Smartphone'
-  },
-  {
-    id: 'bank_bbva',
-    name: 'BBVA Nómina',
-    bank: 'BBVA',
-    accountType: 'checking',
-    accountNumber: '••• 9934',
-    balance: 1150000,
-    currency: 'COP',
-    color: '#0284c7',
-    connected: false,
-    lastSync: new Date().toISOString(),
-    syncMethod: 'open_banking',
-    icon: 'CreditCard'
-  },
-  {
-    id: 'bank_mercadopago',
-    name: 'Mercado Pago Cobros',
-    bank: 'Mercado Pago',
-    accountType: 'digital_wallet',
-    accountNumber: '••• 5519',
-    balance: 310.50,
-    currency: 'USD',
-    color: '#0ea5e9',
-    connected: true,
-    lastSync: new Date().toISOString(),
-    syncMethod: 'webhook',
-    icon: 'ShoppingBag'
   }
 ];
 
@@ -134,9 +109,10 @@ export default function App() {
   const [showAndroidGuide, setShowAndroidGuide] = useState(false);
   const [showWebhook, setShowWebhook] = useState(false);
   const [showConnectBank, setShowConnectBank] = useState(false);
+  const [showInstallModal, setShowInstallModal] = useState(false);
 
-  // PWA install prompt
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  // PWA install hook
+  const pwaState = usePWAInstall();
   const simulatorRef = useRef<HTMLDivElement>(null);
   const autoStreamTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -242,22 +218,9 @@ export default function App() {
       if (text) setCurrentSpokenText(text);
     });
 
-    // 5. Register PWA service worker
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    }
-
-    // 6. Capture beforeinstallprompt for Android PWA install button
-    const installHandler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-    window.addEventListener('beforeinstallprompt', installHandler);
-
     return () => {
       if (eventSource) eventSource.close();
       unsubscribeVoice();
-      window.removeEventListener('beforeinstallprompt', installHandler);
     };
   }, [announceTransaction]);
 
@@ -394,24 +357,17 @@ export default function App() {
     };
   }, []);
 
-  // Android PWA Install trigger
-  const handleInstallPwa = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-      if (choiceResult.outcome === 'accepted') {
-        setDeferredPrompt(null);
-      }
-    } else {
-      setShowAndroidGuide(true);
-    }
-  };
-
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://miapp.com';
   const webhookUrl = `${currentOrigin}/api/webhook/transaction`;
 
   return (
     <div className="min-h-screen bg-[#080d1a] text-slate-100 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
+      {/* PWA Install Notification Banner */}
+      <PWAInstallBanner
+        pwaState={pwaState}
+        onOpenInstallModal={() => setShowInstallModal(true)}
+      />
+
       {/* Top Navigation */}
       <Navbar
         voiceSettings={voiceSettings}
@@ -422,8 +378,9 @@ export default function App() {
         onTestVoice={handleTestVoice}
         isSpeaking={isSpeaking}
         sseConnected={sseConnected}
-        canInstallPwa={!!deferredPrompt}
-        onInstallPwa={handleInstallPwa}
+        canInstallPwa={pwaState.isInstallable}
+        isInstalled={pwaState.isInstalled}
+        onOpenInstallModal={() => setShowInstallModal(true)}
       />
 
       {/* Main Container */}
@@ -537,6 +494,13 @@ export default function App() {
         isOpen={showConnectBank}
         onClose={() => setShowConnectBank(false)}
         onAddBank={handleAddBank}
+      />
+
+      {/* PWA Android Install Modal */}
+      <InstallModal
+        isOpen={showInstallModal}
+        onClose={() => setShowInstallModal(false)}
+        pwaState={pwaState}
       />
     </div>
   );

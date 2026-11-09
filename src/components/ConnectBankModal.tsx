@@ -9,15 +9,9 @@ interface ConnectBankModalProps {
 }
 
 const POPULAR_BANKS = [
-  { name: 'Nequi', icon: 'Smartphone', currency: 'COP' as CurrencyCode, type: 'digital_wallet' as const, color: '#8b5cf6' },
-  { name: 'Bancolombia', icon: 'Building2', currency: 'COP' as CurrencyCode, type: 'savings' as const, color: '#eab308' },
-  { name: 'DaviPlata', icon: 'Smartphone', currency: 'COP' as CurrencyCode, type: 'digital_wallet' as const, color: '#ef4444' },
-  { name: 'BBVA', icon: 'CreditCard', currency: 'COP' as CurrencyCode, type: 'checking' as const, color: '#0284c7' },
-  { name: 'Mercado Pago', icon: 'Smartphone', currency: 'USD' as CurrencyCode, type: 'digital_wallet' as const, color: '#0ea5e9' },
-  { name: 'Nu (Nubank)', icon: 'CreditCard', currency: 'COP' as CurrencyCode, type: 'savings' as const, color: '#9333ea' },
-  { name: 'Santander', icon: 'Building2', currency: 'MXN' as CurrencyCode, type: 'checking' as const, color: '#dc2626' },
-  { name: 'Zelle (EE.UU.)', icon: 'Smartphone', currency: 'USD' as CurrencyCode, type: 'digital_wallet' as const, color: '#7c3aed' },
-  { name: 'Bizum (España)', icon: 'Smartphone', currency: 'EUR' as CurrencyCode, type: 'digital_wallet' as const, color: '#059669' }
+  { name: 'Nequi Personal', icon: 'Smartphone', currency: 'COP' as CurrencyCode, type: 'digital_wallet' as const, color: '#8b5cf6' },
+  { name: 'Nequi Negocios', icon: 'Smartphone', currency: 'COP' as CurrencyCode, type: 'digital_wallet' as const, color: '#a855f7' },
+  { name: 'DaviPlata', icon: 'Smartphone', currency: 'COP' as CurrencyCode, type: 'digital_wallet' as const, color: '#ef4444' }
 ];
 
 export const ConnectBankModal: React.FC<ConnectBankModalProps> = ({
